@@ -1,0 +1,12 @@
+.stats {
+  position: relative;
+}
+
+.stats-page {
+  position: relative;
+  padding-top:20px;
+}
+
+.stats-refs {
+  padding-left:20px;
+}
