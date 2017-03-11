@@ -1,0 +1,32 @@
+html, body {
+  height:100%;
+  background-color:#f6f6f6
+}
+
+.main {
+  min-height:95vh;
+  box-sizing: border-box;
+  padding-bottom:40px;
+}
+
+.sidebar {
+  background-color:#fff
+}
+
+.footer-container {
+  margin-left:15px
+}
+
+.blog-post {
+  padding:5px 0;
+}
+
+.post-body {
+  padding:10px 0 0 0;
+  font-size:14px;
+  line-height:20px;
+}
+
+.post-date {
+  font-size:12px;
+}

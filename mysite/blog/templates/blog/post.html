@@ -2,8 +2,8 @@
 
 {% block content %}
   <h2>{{ post.title }}</h2>
-  <span>{{ post.date|date:'Y-m-d' }}</span>
-  <div>
+  <span class="post-date">{{ post.date|date:'Y-m-d' }}</span>
+  <div class="post-body">
     {{ post.body|safe|linebreaks }}
   </div>
 {% endblock %}
