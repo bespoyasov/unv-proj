@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'personal',
     'blog',
     'graph',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -125,3 +126,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 BASE_DOMAIN = 'http://localhost:8000/'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.DjangoModelPermissions',
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}

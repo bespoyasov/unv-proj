@@ -15,10 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.auth.models import User
+# from rest_framework import routers, serializers, viewsets
+from personal.views import page_collection
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('personal.urls')),
     url(r'^graph', include('graph.urls')),
     url(r'^blog/', include('blog.urls')),
+
+    url(r'^api/v1/stats/$', page_collection, name='api')
 ]
