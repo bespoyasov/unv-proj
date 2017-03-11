@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Дипломный проект</title>
+	<meta charset="utf-8" />
+	{% load staticfiles %}
+	<link rel="stylesheet" href="{% static 'personal/css/bootstrap.min.css' %}" type = "text/css" />
+	<link rel="stylesheet" href="{% static 'personal/css/styles.css' %}" type = "text/css" />
+	<script type="text/javascript" src="{% static 'graph/js/main.js' %}"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body class="body">
+	<div class="container-fluid main">
+		<div class="row">
+		  <div class="col-sm-12">
+
+			<div class='container-fluid'>
+			<br>
+			   {% block content %}
+			   {% endblock %}
+			</div>
+		  </div>
+		</div>
+	</div>
+
+</body>
+
+</html>
