@@ -49,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'mysite.middleware.RefCollectorMiddleware'
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -120,3 +122,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+BASE_DOMAIN = 'http://localhost:8000/'
