@@ -31,3 +31,19 @@ text {
   font: 14px sans-serif;
   pointer-events: none;
 }
+
+
+#rootsvg {
+  position: absolute;
+  left:250px;
+  top:100px;
+}
+
+.url {
+  opacity: 0.4;
+}
+
+.leftpart {
+  display:inline-block;
+  min-width:100px;
+}

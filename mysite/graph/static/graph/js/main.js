@@ -43,7 +43,6 @@ const getCase = (_number, _case1, _case2, _case3) => {
 getData()
   .then(stats => {
 
-    // преобразуем в удобоваримый вид
     _.forEach(stats, item => {
       if (!item.ref) return
 
@@ -56,17 +55,17 @@ getData()
       })
     })
 
-    // создаём нормальный текст
+
     let statsHtml = '<div class="stats">'
 
     _.forEach(stats, item => {
-      statsHtml += '<div class="stats-page">' + item.title + '</div>'
+      statsHtml += '<div class="stats-page">' + item.title + ', <span class="url">(' + item.url + ')</span></div>'
 
       if (item.ref && Object.keys(item.ref).length) {
         const keys = Object.keys(item.ref)
         for (let key of keys) {
           const users = item.ref[key]
-          statsHtml += '<div class="stats-refs">С «' + key + '» — ' + users + ' ' + getCase(users, 'раз', 'раза', 'раз') + '</div>'
+          statsHtml += '<div class="stats-refs"><span class="leftpart">с <span class="url">' + key + '</span></span> ' + users + ' ' + getCase(users, 'раз', 'раза', 'раз') + '</div>'
         }
       }
       else {
@@ -80,7 +79,8 @@ getData()
     rootNode.innerHTML = statsHtml
 
 
-    let links = _.reduce(stats, (res, item) => {
+    let nodes = {}
+    const links = _.reduce(stats, (res, item) => {
       const target = item.url
       const refs = item.ref
 
@@ -88,12 +88,14 @@ getData()
         const repeat = _.findIndex(res, o => o.target == target && o.source == ref)
         if (repeat > -1) {
           res[repeat].value += refs[ref]
+          res[repeat].count += refs[ref]
         }
         else {
           res.push({
             target: target,
             source: ref,
-            value: refs[ref]
+            value: refs[ref],
+            count: refs[ref]
           })
         }
       })
@@ -101,91 +103,119 @@ getData()
       return res
     }, [])
 
-    let nodes = {}
+    links.forEach((link) => {
+      link.source = nodes[link.source] || (nodes[link.source] = {name: link.source})
+      link.target = nodes[link.target] || (nodes[link.target] = {name: link.target})
+      link.value = +link.value
+      link.count = +link.count
+    })
 
-    links.forEach(function(link) {
-      link.source = nodes[link.source] ||
-          (nodes[link.source] = {name: link.source});
-      link.target = nodes[link.target] ||
-          (nodes[link.target] = {name: link.target});
-      link.value = +link.value;
-    });
+    const width = 800, height = 500
 
-    let width = 960,
-        height = 500
-
-    let force = d3.layout.force()
+    const force = d3.layout.force()
       .nodes(d3.values(nodes))
       .links(links)
       .size([width, height])
       .gravity(0.05)
-      .linkDistance(d => d.value * 110)
+      // .linkDistance(d => d.value * 110)
+      .linkDistance(150)
       .charge(-300)
       .on("tick", tick)
-      .start();
+      .start()
 
 
-    let v = d3.scale.linear().range([0, 100]);
-    v.domain([0, d3.max(links, function(d) { return d.value; })]);
+    const v = d3.scale.linear().range([0, 100]).domain([0, d3.max(links, d => d.value)])
+    links.forEach((link) => { link.opacity = v(link.value) / 100 })
 
-    links.forEach(function(link) {
-      link.opacity = v(link.value) / 100
-    });
 
-    let svg = d3.select("body").append("svg")
-        .attr("width", width)
-        .attr("height", height);
+    const svg = d3
+      .select('body')
+      .append('svg')
+      .attr({
+        'id': 'rootsvg',
+        'width': width,
+        'height': height
+      })
 
-    svg.append("svg:defs").selectAll("marker")
-        .data(["end"])
-      .enter().append("svg:marker")
-        .attr("id", String)
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 15)
-        .attr("refY", 0)
-        .attr("markerWidth", 6)
-        .attr("markerHeight", 6)
-        .attr("orient", "auto")
-      .append("svg:path")
-        .attr("d", "M0,-5L10,0L0,5");
+    svg.append('svg:defs')
+      .selectAll('marker')
+      .data(['end'])
+      .enter()
+      .append("svg:marker")
+      .attr({
+        'id': String,
+        'viewBox': '0 -5 10 10',
+        'refX': 15,
+        'refY': 0,
+        'markerWidth': 6,
+        'markerHeight': 6,
+        'orient': 'auto',
+      })
+      .append('svg:path')
+      .attr('d', 'M0,-5L10,0L0,5')
 
-    let path = svg.append("svg:g").selectAll("path")
-        .data(force.links())
-      .enter().append("svg:path")
-        .attr("class", 'link')
-        .attr('opacity', d => d.opacity)
-        .attr("marker-end", "url(#end)");
+    const path = svg
+      .append('svg:g')
+      .selectAll('path')
+      .data(force.links())
+      .enter()
+      .append('svg:path')
+      .attr({
+        'class': 'link',
+        'id': (d, i) => 'edgepath' + i,
+        'opacity': d => d.opacity,
+        'marker-end': 'url(#end)'
+      })
 
-    let node = svg.selectAll(".node")
-        .data(force.nodes())
-      .enter().append("g")
-        .attr("class", "node")
-        .call(force.drag);
+    const edgelabels = svg.selectAll('.edgelabel')
+      .data(force.links())
+      .enter()
+      .append('text')
+      .style('pointer-events', 'none')
+      .attr({
+        'class':'edgelabel',
+        'id': (d,i) => 'edgelabel' + i,
+        'dx':100,
+        'dy':0,
+        'font-size':10,
+        'fill':'#999999'
+      })
 
-    node.append("circle")
-        .attr("r", 6);
+    edgelabels
+      .append('textPath')
+      .attr('xlink:href', (d,i) => '#edgepath' + i)
+      .style('pointer-events', 'none')
+      .text(d => d.count)
 
-    node.append("text")
-        .attr("x", 15)
-        .attr("dy", ".35em")
-        .text(function(d) { return d.name; });
+    const node = svg.selectAll('.node')
+      .data(force.nodes())
+      .enter()
+      .append('g')
+      .attr('class', 'node')
+      .call(force.drag)
+
+    node.append('circle')
+      .attr('r', 6);
+
+    node.append('text')
+      .attr('x', 15)
+      .attr('dy', '.35em')
+      .text(d => d.name)
 
     function tick() {
-      path.attr("d", function(d) {
-        var dx = d.target.x - d.source.x,
-            dy = d.target.y - d.source.y,
-            dr = 0
+      path.attr('d', d => {
+        const dx = d.target.x - d.source.x,
+              dy = d.target.y - d.source.y,
+              dr = 0
 
-        return "M" +
-          d.source.x + "," +
-          d.source.y + "A" +
-          dr + "," + dr + " 0 0,1 " +
-          d.target.x + "," +
+        return 'M' +
+          d.source.x + ',' +
+          d.source.y + 'A' +
+          dr + ',' + dr + ' 0 0,1 ' +
+          d.target.x + ',' +
           d.target.y
       })
 
-      node.attr("transform", function(d) {
-	      return "translate(" + d.x + "," + d.y + ")";
-      })
+      node.attr('transform', d => 'translate(' + d.x + ',' + d.y + ')')
     }
   })
