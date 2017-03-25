@@ -16,8 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth.models import User
-# from rest_framework import routers, serializers, viewsets
-from personal.views import page_collection
+from ref_collector.views import page_collection
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

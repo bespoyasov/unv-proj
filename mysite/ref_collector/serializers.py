@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from personal.models import Page
+from ref_collector.models import Page
 
 class PageSerializer(serializers.ModelSerializer):
     class Meta:

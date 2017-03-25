@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.http import HttpRequest
-from personal.models import Page
+from ref_collector.models import Page
 
 
 class RefCollectorMiddleware(object):

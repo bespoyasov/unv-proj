@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'personal',
     'blog',
     'graph',
+    'ref_collector',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'mysite.middleware.RefCollectorMiddleware'
+    'ref_collector.middleware.RefCollectorMiddleware'
 ]
 
 ROOT_URLCONF = 'mysite.urls'
