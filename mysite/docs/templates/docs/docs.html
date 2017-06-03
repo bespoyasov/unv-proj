@@ -1,0 +1,19 @@
+{% extends "personal/header.html" %}
+
+{% block content %}
+{% load staticfiles %}
+  <h2>Документы</h2>
+
+  {% for post in object_list %}
+    <div class="col-sm-4" style="padding-bottom:30px;">
+    <div class="blog-post">
+      <a href="/docs/{{ post.id }}"><h4>{{ post.title }}</h4></a>
+      <div><img 
+        src="/static/personal/img/{{post.id}}.jpg"
+        style="max-width: 90%; height:auto;" />
+      </div>
+      <span>{{ post.date|date:"Y-m-d" }}</span>
+    </div>
+    </div>
+  {% endfor %}
+{% endblock %}

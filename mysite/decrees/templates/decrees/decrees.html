@@ -1,11 +1,11 @@
 {% extends "personal/header.html" %}
 
 {% block content %}
-  <h2>Новости компании</h2>
+  <h2>Распоряжения и указы</h2>
 
   {% for post in object_list %}
     <div class="blog-post">
-      <a href="/blog/{{ post.id }}"><h4>{{ post.title }}</h4></a>
+      <a href="/decrees/{{ post.id }}"><h4>{{ post.title }}</h4></a>
       <span>{{ post.date|date:"Y-m-d" }}</span>
     </div>
   {% endfor %}

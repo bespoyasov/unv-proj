@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'personal',
     'blog',
+    'docs',
+    'decrees',
     'graph',
     'ref_collector',
     'rest_framework',

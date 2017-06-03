@@ -1,8 +1,11 @@
 {% extends "personal/header.html" %}
 
 {% block content %}
-<h1>О нас, например</h1>
-<p>Куча текста о компании, который обычно никто не читает</p>
+{% load staticfiles %}
+<h1>Уфанет в цифрах</h1>
+<img 
+  src="{% static 'personal/img/ufanet.png' %}"
+  style="max-width: 90%; height:auto;" />
 
 {% include "personal/includes/about.html" %}
 {% endblock %}

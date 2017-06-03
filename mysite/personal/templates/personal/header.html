@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>Дипломный проект</title>
+	<title>Распоряжения и новости</title>
 	<meta charset="utf-8" />
 	{% load staticfiles %}
 	<link rel="stylesheet" href="{% static 'personal/css/bootstrap.min.css' %}" type = "text/css" />
@@ -13,10 +13,23 @@
 <body class="body">
 	<div class="container-fluid main">
 		<div class="row">
-			  <div class="col-sm-12">
-				  <h3><a href="/">Шапка сайта, логотип там и всё такое</a></h3>
+			  <div class="col-sm-11">
+				  <h3><a href="/">Уфанет</a></h3>
 			  </div>
+
+				<!--<div class="col-sm-1" style="text-align: right;">-->
+					<!--<a href="#" style="font-size:40px; text-decoration:none;">☰</a>-->
+					<!--<a href="#" style="font-size:40px; text-decoration:none;">&times;</a>-->
+				<!--</div>-->
 		</div><hr>
+
+		<!--<div style="position:fixed; right:20px;; top: 50px; background: white; padding:10px 20px; z-index:90;">
+			<ul class="nav nav-pills nav-stacked">
+				<li><a href='/'>Главная</a></li>
+				<li><a href='/blog/'>Новости</a></li>
+				<li><a href='/about/'>О компании</a></li>
+			  </ul>
+		</div>-->
 
 		<div class="row">
 		  <div class="col-sm-2">
@@ -26,7 +39,9 @@
 			<div class="well bs-sidebar sidebar" id="sidebar">
 			  <ul class="nav nav-pills nav-stacked">
 				<li><a href='/'>Главная</a></li>
-				<li><a href='/blog/'>Блог</a></li>
+				<li><a href='/blog/'>Новости</a></li>
+				<li><a href='/decrees/'>Распоряжения</a></li>
+				<li><a href='/docs/'>Документы</a></li>
 				<li><a href='/about/'>О компании</a></li>
 				<li><a href='/contact/'>Контактная информация</a></li>
 			  </ul>
@@ -44,7 +59,7 @@
 	</div>
 	<footer>
 		<div class="container-fluid footer-container">
-			<p><a href="https://google.com" target="blank">Ссылки</a> | <a href="https://google.com" target="blank">Подвала</a> | <a href="https://google.com" target="blank">Ведут</a> | <a href="https://google.com" target="blank">Наружу</a></p>
+			<p><a href="https://google.com" target="blank">Основной сайт</a> | <a href="https://google.com" target="blank">Команда</a> | <a href="https://google.com" target="blank">Проекты</a></p>
 		</div>
 	</footer>
 

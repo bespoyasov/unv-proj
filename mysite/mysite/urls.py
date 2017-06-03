@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^', include('personal.urls')),
     url(r'^graph', include('graph.urls')),
     url(r'^blog/', include('blog.urls')),
+    url(r'^docs/', include('docs.urls')),
+    url(r'^decrees/', include('decrees.urls')),
 
     url(r'^api/v1/stats/$', page_collection, name='api')
 ]

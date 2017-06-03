@@ -59,7 +59,7 @@ getData()
     let statsHtml = '<div class="stats">'
 
     _.forEach(stats, item => {
-      statsHtml += '<div class="stats-page">' + item.title + ', <span class="url">(' + item.url + ')</span></div>'
+      statsHtml += '<div class="stats-page"><span class="title">' + item.title + '</span><span class="url">(' + item.url + ')</span></div>'
 
       if (item.ref && Object.keys(item.ref).length) {
         const keys = Object.keys(item.ref)
