@@ -3,7 +3,8 @@
 // Конфиг
 var config = {
   baseurl: '/',
-  apiPrefix: 'api/v1/'
+  apiPrefix: 'api/v1/',
+  protocol: 'graph', // 'map', 'graph'
 };
 
 // АПИ
@@ -39,6 +40,7 @@ var getCase = function getCase(_number, _case1, _case2, _case3) {
 
 // Основа
 getData().then(function (stats) {
+  // stats.splice(9, 2)
 
   _.forEach(stats, function (item) {
     if (!item.ref) return;
@@ -52,6 +54,7 @@ getData().then(function (stats) {
   });
 
   var statsHtml = '<div class="stats">';
+  var noTransitions = []
 
   _.forEach(stats, function (item) {
     statsHtml += '<div class="stats-page"><span class="title">' + item.title + '</span><span class="url">(' + item.url + ')</span></div>';
@@ -84,19 +87,44 @@ getData().then(function (stats) {
         }
       }
     } else {
+      noTransitions.push(item)
       statsHtml += '<div class="stats-refs">Переходов внутри домена не было</div>';
     }
   });
 
   statsHtml += '</div>';
 
+
+  var criticalHtml = '<div><p>На следующие страницы переходов не было:</p>'
+  for (var i in noTransitions) {
+    var item = noTransitions[i]
+    criticalHtml += ('<div>' + item.url + '</div>')
+  }
+  criticalHtml += '</div>'
+
+
   var rootNode = getEl('#root');
-  rootNode.innerHTML = statsHtml;
+  var criticalNode = getEl('#critical');
+
+  if (config.protocol !== 'map') {
+    rootNode.innerHTML = statsHtml;
+    criticalNode.innerHTML = criticalHtml
+  }
+
+  var titleNode = getEl('#title');
+  titleNode.innerHTML = config.protocol !== 'map' 
+    ? 'Статистика по переходам'
+    : 'Карта возможных переходов по страницам сайта'
+  
+  if (config.protocol === 'map' ) {
+    getEl('html').classList.add('is-map')
+  }
 
   var nodes = {};
   var links = _.reduce(stats, function (res, item) {
     var target = item.url;
     var refs = item.ref;
+    var idx = _.findIndex(stats, function(o) { return o.url === target })
 
     _.forEach(Object.keys(refs), function (ref) {
       var repeat = _.findIndex(res, function (o) {
@@ -107,6 +135,7 @@ getData().then(function (stats) {
         res[repeat].count += refs[ref];
       } else {
         res.push({
+          idx: idx,
           target: target,
           source: ref,
           value: refs[ref],
@@ -125,16 +154,22 @@ getData().then(function (stats) {
     link.count = +link.count;
   });
 
+  var bridges
+  if (config.protocol === 'map' ) {
+    bridges = findBridges(stats)
+  }
+
   var width = 800,
-      height = 500;
+      height = 600;
 
   var force = d3.layout.force().nodes(d3.values(nodes)).links(links).size([width, height]).gravity(0.05)
   // .linkDistance(d => d.value * 110)
-  .linkDistance(150).charge(-300).on("tick", tick).start();
+  .linkDistance(200).charge(-400).on("tick", tick).start();
 
   var v = d3.scale.linear().range([0, 100]).domain([0, d3.max(links, function (d) {
     return d.value;
   })]);
+
   links.forEach(function (link) {
     link.opacity = v(link.value) / 100;
   });
@@ -158,30 +193,34 @@ getData().then(function (stats) {
   var path = svg.append('svg:g').selectAll('path').data(force.links()).enter().append('svg:path').attr({
     'class': 'link',
     'id': function id(d, i) {
-      return 'edgepath' + i;
+      var source = d.source.index
+      var target = d.idx
+      return 'edgepath-' + source + '-' + target;
     },
     'opacity': function opacity(d) {
       return d.opacity;
     },
-    'marker-end': 'url(#end)'
+    'marker-end': config.protocol === 'map' ? '' : 'url(#end)'
   });
 
-  var edgelabels = svg.selectAll('.edgelabel').data(force.links()).enter().append('text').style('pointer-events', 'none').attr({
-    'class': 'edgelabel',
-    'id': function id(d, i) {
-      return 'edgelabel' + i;
-    },
-    'dx': 100,
-    'dy': 0,
-    'font-size': 10,
-    'fill': '#999999'
-  });
+  if (config.protocol !== 'map') {
+    var edgelabels = svg.selectAll('.edgelabel').data(force.links()).enter().append('text').style('pointer-events', 'none').attr({
+      'class': 'edgelabel',
+      'id': function id(d, i) {
+        return 'edgelabel' + i;
+      },
+      'dx': 100,
+      'dy': 0,
+      'font-size': 10,
+      'fill': '#999999'
+    });
 
-  edgelabels.append('textPath').attr('xlink:href', function (d, i) {
-    return '#edgepath' + i;
-  }).style('pointer-events', 'none').text(function (d) {
-    return d.count;
-  });
+    edgelabels.append('textPath').attr('xlink:href', function (d, i) {
+      return '#edgepath' + i;
+    }).style('pointer-events', 'none').text(function (d) {
+      return d.count;
+    });
+  }
 
   var node = svg.selectAll('.node').data(force.nodes()).enter().append('g').attr('class', 'node').call(force.drag);
 
@@ -190,6 +229,16 @@ getData().then(function (stats) {
   node.append('text').attr('x', 15).attr('dy', '.35em').text(function (d) {
     return d.name;
   });
+
+  if (config.protocol === 'map' ) {
+    for (var i in bridges) {
+      var bridge = bridges[i]
+      var source = bridge[0]
+      var target = bridge[1]
+      var nd = getEl('#edgepath-' + source + '-' + target)
+      if (nd && nd.classList) nd.classList.add('is-bridge')
+    }
+  }
 
   function tick() {
     path.attr('d', function (d) {
@@ -205,3 +254,124 @@ getData().then(function (stats) {
     });
   }
 });
+
+
+function createMatrix(stats) {
+  var matrix = []
+  var vertices = []
+
+  for (var i in stats) {
+    var item = stats[i]
+    var index = vertices.length
+    vertices[index] = item.url
+    matrix[index] = []
+  }
+
+  for (var i in vertices) {
+    var vertex = vertices[i]
+
+    for (var j in stats) {
+      var keys = Object.keys(stats[j].ref)
+      // для таблицы инцидентности
+      // matrix[i].push(keys.indexOf(vertex) > -1 ? 1 : 0)
+      // для поиска DFS
+      if (keys.indexOf(vertex) > -1) matrix[i].push(+j)
+    }
+  }
+  
+  return matrix
+}
+
+
+function findBridges(stats) {
+  var g = createMatrix(stats)
+  var MAXN = g.length
+  var bridges = []
+  var used = []
+  var tin = []
+  var fup = []
+  var timer
+
+  main()
+  return bridges
+ 
+  function dfs(v, p=-1) {
+    used[v] = true
+    tin[v] = fup[v] = timer++
+
+    for (var i=0; i<g[v].length; ++i) {
+      var to = g[v][i]
+      if (to == p)  continue
+      if (used[to]) fup[v] = Math.min(fup[v], tin[to])
+      else {
+        dfs(to, v)
+        fup[v] = Math.min(fup[v], fup[to])
+        if (fup[to] > tin[v]) markBridge(v, to)
+      }
+    }
+  }
+ 
+  function main() {
+    timer = 0
+    for (var i = 0; i < MAXN; ++i) {
+      used[i] = false
+    }
+    for (var i = 0; i < MAXN; ++i) {
+      if (!used[i]) dfs(i)
+    }
+  }
+
+
+  function markBridge(v, i) {
+    bridges.push([v, i])
+  }
+}
+
+
+
+// function findBridges_backup() {
+//   var pre = []
+//   var low = []
+//   var p = []
+//   var pre_c
+  
+//   startSearch(graph)
+
+//   function dfs(v, size) {
+//     pre[v] = pre_c
+//     low[v] = pre_c
+//     pre_c++
+    
+//     for(var i = 0; i < size; i++) {
+//       if (graph[v][i] !== 0) {
+
+//         if(pre[i] === 0) {
+//           p[i] = v
+//           dfs(i)
+
+//           low[v] = Math.min(low[v], low[i])
+//           if (low[i] > pre[v]) markBridge(v,i)
+//         }
+//         else if (p[v] !== i) {
+//           low[v] = Math.min(low[v], pre[i])
+//         } 
+//       }
+//     }
+//   }
+
+
+//   function startSearch(graph) {
+//     var size = graph.length
+//     pre_c=1
+//     pre = []
+//     low = []
+//     p = []
+
+//     for(var i = 0; i < size; i++) {
+//       pre[i] = low[i] = p[i] = 0
+//     }
+//     for(var i = 0; i < size; i++) {
+//       if (pre[i] == 0) dfs(i, size)
+//     }
+//   }
+// }

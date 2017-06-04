@@ -110,7 +110,7 @@ getData()
       link.count = +link.count
     })
 
-    const width = 800, height = 500
+    const width = 800, height = 600
 
     const force = d3.layout.force()
       .nodes(d3.values(nodes))

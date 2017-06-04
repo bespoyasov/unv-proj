@@ -27,6 +27,10 @@ path.link {
   stroke-width: 1.5px;
 }
 
+path.link.is-bridge {
+  stroke: red
+}
+
 circle {
   fill: #ccc;
   stroke: #fff;
@@ -44,6 +48,18 @@ text {
   position: absolute;
   left:250px;
   top:100px;
+}
+
+#critical {
+  position: absolute;
+  left:250px;
+  top:700px;
+}
+
+.is-map #rootsvg {
+  position: absolute;
+  left:0px;
+  top:30px;
 }
 
 .url {
