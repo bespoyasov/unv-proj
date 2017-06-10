@@ -95,10 +95,11 @@ getData().then(function (stats) {
   statsHtml += '</div>';
 
 
-  var criticalHtml = '<div><p>На следующие страницы переходов не было:</p>'
+  var criticalHtml = '<div><p>Список страниц, не посещённых пользователями:</p>'
   for (var i in noTransitions) {
     var item = noTransitions[i]
-    criticalHtml += ('<div>' + item.url + '</div>')
+    console.log(item.title)
+    criticalHtml += ('<div><span class="no-transition-name">' + item.title + '</span> <span class="url">(' + item.url + ')</span></div>')
   }
   criticalHtml += '</div>'
 

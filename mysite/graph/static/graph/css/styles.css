@@ -52,7 +52,7 @@ text {
 
 #critical {
   position: absolute;
-  left:250px;
+  left:350px;
   top:700px;
 }
 
@@ -69,4 +69,11 @@ text {
 .leftpart {
   display:inline-block;
   min-width:100px;
+}
+
+
+.no-transition-name {
+  display: inline-block;
+  vertical-align: top;
+  max-width:350px;
 }
